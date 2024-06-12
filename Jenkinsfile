@@ -8,6 +8,7 @@ pipeline {
                 docker {
                     image 'node18-alpine'
                     reuseNode true
+                    args '-u root:root'
                 }
             }
 
@@ -31,6 +32,7 @@ pipeline {
                 docker{
                     image 'node:18-alpine'
                     reuseNode true
+                    args '-u root:root'
                 }
             }
 
@@ -40,6 +42,28 @@ pipeline {
                 test -f build/index.html
                 npm test
                 
+                '''
+            }
+        }
+
+
+
+        stage('E2E'){
+
+            agent {
+                docker { image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
+                
+                reuseNode true
+                args '-u root:root'
+                
+                 }
+            }
+
+            steps{
+                sh '''
+                npm install -g serve
+                serve -s build
+                npx playwright test
                 '''
             }
         }
